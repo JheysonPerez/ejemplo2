@@ -29,6 +29,9 @@ jobs:
   Prueba2: 
     runs-on: ubuntu-latest
     steps: 
+      - name: "Crea Archivo"
+        run: touch alumnos.txt
+        
       - name: "Muestra contenido de alumnos.txt"
         run: cat alumnos.txt
 
