@@ -8,4 +8,7 @@ jobs:
     steps: 
       - name: Mensaje
         run: echo "Primera iteraccion con Git ACTIONS"
+
+      - name: Crea Archivo
+        run: touch alumnos.txt
         
