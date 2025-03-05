@@ -6,6 +6,32 @@ jobs:
   prueba1: 
     runs-on: ubuntu-latest
     steps: 
-      - name: Mensaje
-        run: echo "Primera iteraccion con Git Actions"
+      - name: "Checkout del repositorio"
+        uses: actions/checkout@v3
+
+      - name: "Mensaje"
+        run: echo "Primera iteracción con Git ACTIONS"
+
+      - name: "Crea Archivo"
+        run: touch alumnos.txt
+
+      - name: "Adiciona Alumnos"
+        run: |
+          echo "Alumno1" >> alumnos.txt
+          echo "Alumno2" >> alumnos.txt
+          echo "Alumno3" >> alumnos.txt
+          echo "Alumno4" >> alumnos.txt
+          echo "Alumno5" >> alumnos.txt
+
+      - name: "Muestra Contenido"
+        run: cat alumnos.txt
+
+  Prueba2: 
+    runs-on: ubuntu-latest
+    steps: 
+      - name: "Crea Archivo"
+        run: touch alumnos.txt
         
+      - name: "Muestra contenido de alumnos.txt"
+        run: cat alumnos.txt
+
