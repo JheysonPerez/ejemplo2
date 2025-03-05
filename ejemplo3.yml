@@ -14,10 +14,10 @@ jobs:
         
       - name: "Adiciona Alumnos"
         run: echo "Alumno1" >> alumnos.txt
-        run: echo "Alumno2" >> alumnos.txt
-        run: echo "Alumno3" >> alumnos.txt
-        run: echo "Alumno4" >> alumnos.txt
-        run: echo "Alumno5" >> alumnos.txt
+             echo "Alumno2" >> alumnos.txt
+             echo "Alumno3" >> alumnos.txt
+             echo "Alumno4" >> alumnos.txt
+             echo "Alumno5" >> alumnos.txt
 
       - name: "Muestra Contenido"
         run: cat alumnos.txt
