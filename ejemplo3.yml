@@ -25,3 +25,10 @@ jobs:
 
       - name: "Muestra Contenido"
         run: cat alumnos.txt
+
+  Prueba2: 
+    runs-on: ubuntu-latest
+    steps: 
+      - name: "Muestra contenido de alumnos.txt"
+        run: cat alumnos.txt
+
