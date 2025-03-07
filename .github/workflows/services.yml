@@ -1,4 +1,4 @@
-name: workflow-services
+name: services
 
 on:
     push:
@@ -9,12 +9,12 @@ jobs:
   trabajo1: 
     runs-on: ubuntu-latest
 
-    services: 
-      mysql: 
+    services:
+      mysql:
         image: mysql:5.7
-        env: 
+        env:
           MYSQL_ROOT_PASSWORD: root
-        ports: 
+        ports:
           - 3306:3306
 
     steps: 
