@@ -17,8 +17,3 @@ jobs:
         ports:
           - 3306:3306
 
-    steps: 
-      - name: "Checkout del repositorio"
-        uses: actions/checkout@v2
-      - name: listar archivos
-        run: ls -la
