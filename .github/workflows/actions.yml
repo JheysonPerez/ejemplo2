@@ -1,0 +1,14 @@
+name: workflow-services
+
+on:
+    push:
+        branches:
+            - main
+
+jobs: 
+  trabajo1: 
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: listar archivos
+        run: ls -la
