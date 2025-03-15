@@ -27,15 +27,18 @@ jobs:
 
     - name: Correr la app con Gunicorn en segundo plano
       run: |
-        gunicorn -b 0.0.0.0:5000 app:app & 
+        gunicorn -b 0.0.0.0:5000 app:app &
 
     - name: Exponer la app con ngrok
       run: |
         pip install pyngrok
-        ngrok authtoken ${{ secrets.NGROK_AUTHTOKEN }}  # Usar el authtoken de ngrok
+        ngrok authtoken ${{ secrets.NGROK_AUTHTOKEN }}
         nohup ngrok http 5000 &  # Ejecutar ngrok en segundo plano
+
+    - name: Mantener el contenedor activo
+      run: |
+        sleep 3600  # Mantiene el contenedor activo por 1 hora
 
     - name: Mostrar la URL de ngrok
       run: |
-        sleep 5  # Esperar a que ngrok se inicie
-        curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url'  # Obtener y mostrar la URL pública de ngrok
+        curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url'
