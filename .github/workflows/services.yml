@@ -24,7 +24,14 @@ jobs:
         ports:
           - 5000:5000
 
-    steps: 
-      - name: "Checkout del repositorio"
-        uses: actions/checkout@v2
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v2
 
+    - name: Instalar dependencias
+      run: |
+       pip install -r requirements.txt
+
+    - name: Correr la app
+      run: |
+       python app.py
