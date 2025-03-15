@@ -25,11 +25,11 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Correr la app con Gunicorn
+    - name: Correr la app con Gunicorn en segundo plano
       run: |
-        gunicorn -b 0.0.0.0:5000 app:app
+        gunicorn -b 0.0.0.0:5000 app:app & 
 
     - name: Exponer la app con ngrok
       run: |
         pip install pyngrok
-        nohup ngrok http 5000 &  # Ejecutamos ngrok en segundo plano
+        nohup ngrok http 5000 &  
