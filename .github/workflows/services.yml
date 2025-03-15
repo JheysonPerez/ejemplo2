@@ -35,6 +35,7 @@ jobs:
         ngrok authtoken ${{ secrets.NGROK_AUTHTOKEN }}
         nohup ngrok http 5000 &  # Ejecuta ngrok en segundo plano
 
-    - name: Mantener el contenedor activo
+    - name: Mostrar la URL de ngrok
       run: |
-        sleep 3600  # Mantén el contenedor activo por 1 hora
+        cat /home/runner/.config/ngrok/ngrok.yml
+      
