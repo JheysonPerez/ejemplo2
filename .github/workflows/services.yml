@@ -27,11 +27,11 @@ jobs:
     steps:
     - name: Checkout del repositorio
       uses: actions/checkout@v2
-      
+
     - name: Instalar dependencias
       run: |
        pip install -r requirements.txt
 
     - name: Correr la app
       run: |
-       python app.py
+       gunicorn -b 0.0.0.0:5000 app:app
