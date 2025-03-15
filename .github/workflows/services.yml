@@ -32,4 +32,5 @@ jobs:
     - name: Exponer la app con ngrok
       run: |
         pip install pyngrok
-        nohup ngrok http 5000 &  
+        ngrok authtoken ${{ secrets.NGROK_AUTHTOKEN }}  # Aquí se configura el authtoken
+        nohup ngrok http 5000 &   # Ejecuta ngrok en segundo plano
