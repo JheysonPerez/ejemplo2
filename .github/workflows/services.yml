@@ -32,5 +32,9 @@ jobs:
     - name: Exponer la app con ngrok
       run: |
         pip install pyngrok
-        ngrok authtoken ${{ secrets.NGROK_AUTHTOKEN }}  # Aquí se configura el authtoken
-        nohup ngrok http 5000 &   # Ejecuta ngrok en segundo plano
+        ngrok authtoken ${{ secrets.NGROK_AUTHTOKEN }}
+        nohup ngrok http 5000 &  # Ejecuta ngrok en segundo plano
+
+    - name: Mantener el contenedor activo
+      run: |
+        sleep 3600  # Mantén el contenedor activo por 1 hora
