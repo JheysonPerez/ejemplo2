@@ -1,12 +1,12 @@
 name: services
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
-jobs: 
-  proyecto: 
+jobs:
+  proyecto:
     runs-on: ubuntu-latest
 
     services:
@@ -17,21 +17,19 @@ jobs:
         ports:
           - 3306:3306
 
-      python:
-        image: python:3.8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-          - 5000:5000
-
     steps:
     - name: Checkout del repositorio
       uses: actions/checkout@v2
 
     - name: Instalar dependencias
       run: |
-       pip install -r requirements.txt
+        pip install -r requirements.txt
 
-    - name: Correr la app
+    - name: Correr la app con Gunicorn
       run: |
-       gunicorn -b 0.0.0.0:5000 app:app
+        gunicorn -b 0.0.0.0:5000 app:app
+
+    - name: Exponer la app con ngrok
+      run: |
+        pip install pyngrok
+        nohup ngrok http 5000 &  # Ejecutamos ngrok en segundo plano

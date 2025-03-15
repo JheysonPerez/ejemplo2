@@ -1,3 +1,4 @@
 flask
 gunicorn
+pyngrok
 mysql-connector-python
