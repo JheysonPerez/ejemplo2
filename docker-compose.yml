@@ -24,7 +24,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mi_basedatos
     ports:
-      - "3309:3306"
+      - "3310:3306"
     networks:
       - app_network  # Conectamos mysql a la red app_network
 

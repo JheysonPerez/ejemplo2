@@ -16,7 +16,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: mi_basedatos
         ports:
-          - 3309:3306
+          - 3310:3306
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
