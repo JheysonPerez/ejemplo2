@@ -13,7 +13,7 @@ def hello():
             database="testdb"
         )
         cursor = connection.cursor()
-        cursor.execute("SELECT 'Hello from MySQL!'")
+        cursor.execute("SELECT 'EStoy agarrando señal desde MySql :P!'")
         result = cursor.fetchone()
         return result[0]
     except Exception as e:

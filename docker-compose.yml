@@ -4,7 +4,6 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: testdb
@@ -20,9 +19,8 @@ services:
 
   flask:
     build:
-      context: ./flask
+      context: ./flask  # Aquí indicas que el Dockerfile está dentro de la carpeta flask
     container_name: flask
-    restart: always
     ports:
       - "5000:5000"
     depends_on:
