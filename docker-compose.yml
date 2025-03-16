@@ -21,7 +21,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mi_basedatos
     ports:
-      - "3307:3306"
+      - "3308:3306"
     networks:
       - app_network
 
