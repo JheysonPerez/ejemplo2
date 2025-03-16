@@ -1,4 +1,4 @@
-name: Deploy Docker App
+name: CI/CD para App Flask y MySQL
 
 on:
   push:
@@ -6,31 +6,36 @@ on:
       - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest  # GitHub Actions runner
+  build:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: mi_basedatos
+        ports:
+          - 3306:3306
 
     steps:
-      - name: Checkout del repositorio
-        uses: actions/checkout@v3
+    - name: Checkout del repositorio
+      uses: actions/checkout@v2
 
-      - name: Configurar Docker Buildx (opcional, pero recomendado)
-        uses: docker/setup-buildx-action@v3
+    - name: Instalar Docker
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
 
-      - name: Mostrar versión de Docker (ya viene instalado)
-        run: |
-          docker --version
-          docker compose version
+    - name: Crear y ejecutar los contenedores
+      run: |
+        docker-compose -f docker-compose.yml up -d
 
-      - name: Levantar los contenedores con Docker Compose
-        run: |
-          docker compose up -d --build
+    - name: Verificar si la aplicación está corriendo
+      run: |
+        sleep 10  # Espera a que los servicios estén listos
+        curl http://localhost:5000  # Reemplaza con la URL correcta de tu app
 
-      - name: Mostrar contenedores activos
-        run: docker ps
-
-      - name: Mostrar logs del contenedor de la app
-        run: docker logs $(docker ps -q --filter "name=app")
-
-      # Mantener el runner activo si quieres inspeccionar el estado
-      - name: Mantener el contenedor activo (opcional)
-        run: sleep 3600
+    - name: Detener los contenedores
+      run: |
+        docker-compose down

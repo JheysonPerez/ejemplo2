@@ -1,24 +1,30 @@
 version: '3.8'
 
 services:
-  app:
-    build: .
+  web:
+    image: ejemplo2-app  # Esta imagen debe contener tu aplicación Flask
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
+    environment:
+      - DATABASE_URL=mysql://root:root@mysql:3306/mi_basedatos
     depends_on:
       - mysql
-    environment:
-      - DATABASE_HOST=mysql
-      - DATABASE_USER=root
-      - DATABASE_PASSWORD=root
-      - DATABASE_NAME=mi_basedatos
-    restart: always
+    networks:
+      - app_network
 
   mysql:
     image: mysql:5.7
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mi_basedatos
     ports:
       - "3306:3306"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
