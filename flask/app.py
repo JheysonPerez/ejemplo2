@@ -1,33 +1,26 @@
-import os
-import mysql.connector
 from flask import Flask
+import pyodbc
 
 app = Flask(__name__)
 
-# Obtener la URL de la base de datos desde las variables de entorno
-DATABASE_URL = os.getenv('DATABASE_URL', 'mysql://root:root@mysql:3306/mi_basedatos')
-
 def get_db_connection():
-    # Crear la conexión a la base de datos MySQL
-    connection = mysql.connector.connect(
-        host='mysql',  # El nombre del servicio en Docker Compose
-        user='root',
-        password='root',
-        database='mi_basedatos'
+    conn = pyodbc.connect(
+        'DRIVER={ODBC Driver 17 for SQL Server};'
+        'SERVER=sqlserver;'
+        'DATABASE=master;'
+        'UID=sa;'
+        'PWD=YourStrong!Passw0rd'
     )
-    return connection
+    return conn
 
 @app.route('/')
-def home():
-    # Verificar si la conexión a la base de datos funciona
+def index():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT NOW()')  # Comando simple para probar la conexión
-    result = cursor.fetchone()
+    cursor.execute('SELECT @@VERSION')
+    row = cursor.fetchone()
     conn.close()
-    
-    # Mostrar el resultado (la hora del servidor MySQL)
-    return f"Conexión exitosa, hora del servidor MySQL: {result[0]}"
+    return f'SQL Server version: {row[0]}'
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)
