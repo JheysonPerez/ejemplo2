@@ -18,13 +18,23 @@ jobs:
 
       - name: Clean up previous containers (if any)
         run: |
+          echo "Limpiando contenedores previos..."
           docker compose down --volumes --remove-orphans || true
 
       - name: Build and run containers
         run: |
+          echo "Levantando servicios..."
           docker compose up -d
-          echo "Esperando 15 segundos para que los servicios se inicialicen..."
-          sleep 15
+          
+      - name: Esperar que SQL Server esté listo
+        run: |
+          echo "Esperando que SQL Server esté listo en el puerto 1433..."
+          for i in {1..30}; do
+            nc -z localhost 1433 && echo "SQL Server está listo" && exit 0
+            echo "Esperando... intento $i"
+            sleep 5
+          done
+          echo "SQL Server no respondió a tiempo" && exit 1
 
       - name: Mostrar logs de SQL Server
         run: docker logs sqlserver
@@ -32,12 +42,17 @@ jobs:
       - name: Mostrar logs de Flask
         run: docker logs flask
 
-      # Aquí podrías poner tus pruebas o verificaciones de conexión
-      - name: Verificar conexión SQL Server
+      - name: Verificar conexión a SQL Server
         run: |
-          echo "Verificando si SQL Server está corriendo..."
-          docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -Q 'SELECT @@VERSION'
+          echo "Probando conexión a SQL Server..."
+          docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'YourStrong!Passw0rd' -Q "SELECT @@VERSION"
+
+      # Aquí podrías agregar tus pruebas de integración
+      # - name: Run tests
+      #   run: pytest tests/
 
       - name: Tear down containers
-        if: always()  # Esto asegura que se ejecute aunque falle un paso anterior
-        run: docker-compose down --volumes --remove-orphans
+        if: always()  # Esto asegura que siempre se limpien los recursos
+        run: |
+          echo "Apagando contenedores..."
+          docker compose down --volumes --remove-orphans
