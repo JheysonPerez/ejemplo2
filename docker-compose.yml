@@ -19,12 +19,12 @@ services:
       - app_network  # Conectamos flask_app a la red app_network
 
   mysql:
-    image: mysql:5.7
+    image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mi_basedatos
     ports:
-      - "3310:3306"
+      - "3320:3306"
     networks:
       - app_network  # Conectamos mysql a la red app_network
 
