@@ -34,8 +34,11 @@ jobs:
     - name: Verificar si la aplicación está corriendo
       run: |
         sleep 10  # Espera a que los servicios estén listos
-        curl http://localhost:5000  # Reemplaza con la URL correcta de tu app
+        curl http://localhost:5000  
 
     - name: Detener los contenedores
       run: |
         docker-compose down
+
+
+    
