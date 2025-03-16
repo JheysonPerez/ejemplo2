@@ -18,11 +18,11 @@ jobs:
 
       - name: Clean up previous containers (if any)
         run: |
-          docker-compose down --volumes --remove-orphans || true
+          docker compose down --volumes --remove-orphans || true
 
       - name: Build and run containers
         run: |
-          docker-compose up -d
+          docker compose up -d
           echo "Esperando 15 segundos para que los servicios se inicialicen..."
           sleep 15
 
