@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    image: ejemplo2-app  # Esta imagen debe contener tu aplicación Flask
+    image: flask_app
     build:
       context: .
       dockerfile: Dockerfile
