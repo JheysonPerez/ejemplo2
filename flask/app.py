@@ -1,26 +1,23 @@
 from flask import Flask
-import pyodbc
+import pymysql
 
 app = Flask(__name__)
 
-def get_db_connection():
-    conn = pyodbc.connect(
-        'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=sqlserver;'
-        'DATABASE=master;'
-        'UID=sa;'
-        'PWD=YourStrong!Passw0rd'
-    )
-    return conn
+@app.route("/")
+def hello():
+    try:
+        connection = pymysql.connect(
+            host="mysql",
+            user="user",
+            password="userpassword",
+            database="testdb"
+        )
+        cursor = connection.cursor()
+        cursor.execute("SELECT 'Hello from MySQL!'")
+        result = cursor.fetchone()
+        return result[0]
+    except Exception as e:
+        return f"Error: {str(e)}"
 
-@app.route('/')
-def index():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('SELECT @@VERSION')
-    row = cursor.fetchone()
-    conn.close()
-    return f'SQL Server version: {row[0]}'
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)

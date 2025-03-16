@@ -1,4 +1,4 @@
-name: Proyecto
+name: Proyecto con MySQL y Flask
 
 on:
   push:
@@ -26,33 +26,29 @@ jobs:
           echo "Levantando servicios..."
           docker compose up -d
           
-      - name: Esperar que SQL Server esté listo
+      - name: Esperar que MySQL esté listo
         run: |
-          echo "Esperando que SQL Server esté listo en el puerto 1433..."
-          for i in {1..30}; do
-            nc -z localhost 1433 && echo "SQL Server está listo" && exit 0
+          echo "Esperando que MySQL esté listo en el puerto 3306..."
+          for i in {1..20}; do
+            nc -z localhost 3306 && echo "MySQL está listo" && exit 0
             echo "Esperando... intento $i"
             sleep 5
           done
-          echo "SQL Server no respondió a tiempo" && exit 1
+          echo "MySQL no respondió a tiempo" && exit 1
 
-      - name: Mostrar logs de SQL Server
-        run: docker logs sqlserver
+      - name: Mostrar logs de MySQL
+        run: docker logs mysql
 
       - name: Mostrar logs de Flask
         run: docker logs flask
 
-      - name: Verificar conexión a SQL Server
+      - name: Probar servicio Flask
         run: |
-          echo "Probando conexión a SQL Server..."
-          docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'YourStrong!Passw0rd' -Q "SELECT @@VERSION"
-
-      # Aquí podrías agregar tus pruebas de integración
-      # - name: Run tests
-      #   run: pytest tests/
+          echo "Verificando respuesta del servicio Flask..."
+          curl --retry 5 --retry-delay 5 --fail http://localhost:5000
 
       - name: Tear down containers
-        if: always()  # Esto asegura que siempre se limpien los recursos
+        if: always()  # Limpia aunque haya fallos antes
         run: |
           echo "Apagando contenedores..."
           docker compose down --volumes --remove-orphans
