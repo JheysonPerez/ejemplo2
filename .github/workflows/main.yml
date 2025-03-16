@@ -13,7 +13,7 @@ jobs:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
         options: >-
-          --health-cmd="wait-for-it localhost:1433 --timeout=60"  # Espera que SQL Server esté listo
+          --health-cmd="wait-for-it localhost:1433 --timeout=60" 
           --env ACCEPT_EULA=Y
           --env SA_PASSWORD=YourStrong!Passw0rd
         ports:
@@ -28,7 +28,7 @@ jobs:
 
     - name: Clean up previous containers
       run: |
-        docker-compose down --volumes --remove-orphans  # Elimina contenedores y volúmenes huérfanos
+        docker-compose down --volumes --remove-orphans  
 
     - name: Build and run containers
       run: |
@@ -39,3 +39,7 @@ jobs:
       run: |
         PORT=$(docker port ejemplo2_sqlserver_1 1433 | cut -d ':' -f2)
         echo "SQL Server está escuchando en el puerto: $PORT"
+
+    - name: Clean up previous containers
+      run: |
+       docker-compose down --volumes --remove-orphans
