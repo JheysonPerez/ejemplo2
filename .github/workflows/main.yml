@@ -1,0 +1,41 @@
+name: Proyecto
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        options: >-
+          --health-cmd="wait-for-it localhost:1433 --timeout=60"  # Espera que SQL Server esté listo
+          --env ACCEPT_EULA=Y
+          --env SA_PASSWORD=YourStrong!Passw0rd
+        ports:
+          - 1433:1433
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Clean up previous containers
+      run: |
+        docker-compose down --volumes --remove-orphans  # Elimina contenedores y volúmenes huérfanos
+
+    - name: Build and run containers
+      run: |
+        docker-compose -f docker-compose.yml up -d
+        sleep 10  # Espera a que los servicios estén listos
+
+    - name: Get the dynamic port for SQL Server
+      run: |
+        PORT=$(docker port ejemplo2_sqlserver_1 1433 | cut -d ':' -f2)
+        echo "SQL Server está escuchando en el puerto: $PORT"

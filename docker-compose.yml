@@ -1,33 +1,38 @@
-version: '3'
-services:
-  flask_app:
-    image: flask_app_image  # Reemplaza esto con tu propia imagen de Flask, o puedes definir un build en caso de que quieras construir la imagen
-    build:
-      context: .
-      dockerfile: Dockerfile  # Especifica tu Dockerfile si lo necesitas
-    ports:
-      - "5000:5000"
-    environment:
-      MYSQL_HOST: mysql  # El nombre del servicio MySQL que definimos en GitHub Actions
-      MYSQL_PORT: 3306
-      MYSQL_DATABASE: mi_basedatos
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-    depends_on:
-      - mysql  # Asegura que MySQL esté levantado antes de iniciar Flask
-    networks:
-      - app_network  # Conectamos flask_app a la red app_network
+version: '3.8'
 
-  mysql:
-    image: mysql:8.0
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ejemplo2_sqlserver_1
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mi_basedatos
+      ACCEPT_EULA: Y
+      SA_PASSWORD: "YourStrong!Passw0rd"
     ports:
-      - "3320:3306"
+      - "1433"  # Puerto dinámico, Docker asignará un puerto aleatorio
     networks:
-      - app_network  # Conectamos mysql a la red app_network
+      - app_network
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  flask:
+    build:
+      context: ./flask  # La carpeta donde está el Dockerfile de Flask
+    container_name: ejemplo2_flask_1
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - DATABASE_URL=mssql+pyodbc://sa:YourStrong!Passw0rd@sqlserver:1433/your_database?driver=ODBC+Driver+17+for+SQL+Server
+    ports:
+      - "5000:5000"  # Puerto de Flask
+    depends_on:
+      - sqlserver
+    networks:
+      - app_network
 
 networks:
-  app_network:  # Definimos la red 'app_network'
+  app_network:
     driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local
