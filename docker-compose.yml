@@ -1,19 +1,20 @@
-version: '3.8'
-
+version: '3'
 services:
-  web:
-    image: flask_app
+  flask_app:
+    image: flask_app_image  # Reemplaza esto con tu propia imagen de Flask, o puedes definir un build en caso de que quieras construir la imagen
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile  # Especifica tu Dockerfile si lo necesitas
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_URL=mysql://root:root@mysql:3306/mi_basedatos
+      MYSQL_HOST: mysql  # El nombre del servicio MySQL que definimos en GitHub Actions
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: mi_basedatos
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
     depends_on:
-      - mysql
-    networks:
-      - app_network
+      - mysql  # Asegura que MySQL esté levantado antes de iniciar Flask
 
   mysql:
     image: mysql:5.7
@@ -21,10 +22,6 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mi_basedatos
     ports:
-      - "3308:3306"
+      - "3309:3306"
     networks:
       - app_network
-
-networks:
-  app_network:
-    driver: bridge
