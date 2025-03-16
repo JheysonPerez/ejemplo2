@@ -22,10 +22,14 @@ jobs:
     - name: Checkout del repositorio
       uses: actions/checkout@v2
 
-    - name: Instalar Docker
+    # Usa la acción de Docker preconfigurada de GitHub
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Instalar Docker Compose
       run: |
-        sudo apt-get update
-        sudo apt-get install -y docker.io
+        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
 
     - name: Crear y ejecutar los contenedores
       run: |
@@ -34,11 +38,9 @@ jobs:
     - name: Verificar si la aplicación está corriendo
       run: |
         sleep 10  # Espera a que los servicios estén listos
-        curl http://localhost:5000  
+        docker ps  # Verifica los contenedores en ejecución
+        docker-compose exec flask_app curl http://localhost:5000  # Ejecuta curl dentro del contenedor Flask
 
     - name: Detener los contenedores
       run: |
         docker-compose down
-
-
-    
