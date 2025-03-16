@@ -7,25 +7,30 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # GitHub Actions runner
 
     steps:
-    - name: Checkout del repositorio
-      uses: actions/checkout@v3
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
 
-    - name: Instalar Docker y Docker Compose
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker.io docker-compose
-        sudo systemctl start docker
+      - name: Configurar Docker Buildx (opcional, pero recomendado)
+        uses: docker/setup-buildx-action@v3
 
-    - name: Construir y levantar los contenedores
-      run: |
-        docker-compose up -d --build
+      - name: Mostrar versión de Docker (ya viene instalado)
+        run: |
+          docker --version
+          docker compose version
 
-    - name: Verificar los contenedores activos
-      run: docker ps
+      - name: Levantar los contenedores con Docker Compose
+        run: |
+          docker compose up -d --build
 
-    # Esto es opcional para mantener el runner activo si necesitas pruebas
-    - name: Mantener el contenedor activo por 1 hora (opcional)
-      run: sleep 3600
+      - name: Mostrar contenedores activos
+        run: docker ps
+
+      - name: Mostrar logs del contenedor de la app
+        run: docker logs $(docker ps -q --filter "name=app")
+
+      # Mantener el runner activo si quieres inspeccionar el estado
+      - name: Mantener el contenedor activo (opcional)
+        run: sleep 3600
