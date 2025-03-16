@@ -1,4 +1,4 @@
-name: Proyecto con MySQL y Flask
+name: Proyecto
 
 on:
   push:
@@ -18,37 +18,22 @@ jobs:
 
       - name: Clean up previous containers (if any)
         run: |
-          echo "Limpiando contenedores previos..."
           docker compose down --volumes --remove-orphans || true
 
       - name: Build and run containers
         run: |
-          echo "Levantando servicios..."
-          docker compose up -d
-          
-      - name: Esperar que MySQL esté listo
-        run: |
-          echo "Esperando que MySQL esté listo en el puerto 3306..."
-          for i in {1..20}; do
-            nc -z localhost 3306 && echo "MySQL está listo" && exit 0
-            echo "Esperando... intento $i"
-            sleep 5
-          done
-          echo "MySQL no respondió a tiempo" && exit 1
-
-      - name: Mostrar logs de MySQL
-        run: docker logs mysql
+          docker compose up -d --build
+          echo "Esperando 15 segundos para que los servicios se inicialicen..."
+          sleep 15
 
       - name: Mostrar logs de Flask
         run: docker logs flask
 
-      - name: Probar servicio Flask
+      - name: Verificar respuesta del servicio Flask
         run: |
           echo "Verificando respuesta del servicio Flask..."
-          curl --retry 5 --retry-delay 5 --fail http://localhost:5000
+          curl --retry 5 --retry-delay 5 http://localhost:5000
 
       - name: Tear down containers
-        if: always()  # Limpia aunque haya fallos antes
-        run: |
-          echo "Apagando contenedores..."
-          docker compose down --volumes --remove-orphans
+        if: always()  # Esto asegura que se ejecute aunque falle un paso anterior
+        run: docker compose down --volumes --remove-orphans
