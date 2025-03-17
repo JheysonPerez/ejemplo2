@@ -89,17 +89,18 @@ jobs:
             sleep 10
           done
 
+ arama
       - name: Subir respuesta de Flask como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: flask-response-job-1
           path: flask_response.txt
 
-  # Job 2 post-despliegue, depende de Job 1
+  # Job 2 post-despliegue, corre en paralelo pero espera dinámicamente el artifact
   post_despliegue_job_2:
     name: Post-Despliegue Job 2 - Verificar MySQL
     runs-on: ubuntu-latest
-    needs: [despliegue, post_despliegue_job_1]
+    needs: despliegue
     steps:
       - name: Clonar el repositorio
         uses: actions/checkout@v4
@@ -110,11 +111,21 @@ jobs:
       - name: Levantar los servicios
         run: docker compose up -d
 
-      - name: Descargar respuesta de Job 1
-        uses: actions/download-artifact@v4
-        with:
-          name: flask-response-job-1
-          path: .
+      - name: Esperar y descargar respuesta de Job 1
+        run: |
+          echo "Esperando el artifact de Job 1..."
+          for i in {1..5}; do
+            if actions/download-artifact@v4 --name flask-response-job-1 --path . 2>/dev/null; then
+              echo "Artifact descargado exitosamente"
+              break
+            fi
+            echo "Esperando artifact... intento $i/5"
+            sleep 10
+          done
+          if [ ! -f flask_response.txt ]; then
+            echo "No se pudo descargar el artifact después de 5 intentos"
+            exit 1
+          fi
 
       - name: Verificar conexión a MySQL
         run: |
