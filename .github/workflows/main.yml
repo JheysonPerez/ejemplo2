@@ -28,22 +28,28 @@ jobs:
         run: |
           docker compose up -d --build
           echo "Esperando que los servicios arranquen..."
+          # Verificar estado de los contenedores
+          docker ps -a
           # Esperar a que MySQL esté listo
-          for i in {1..15}; do
+          for i in {1..5}; do
             if docker exec mysql mysqladmin ping -h localhost -uuser -puserpassword; then
               echo "MySQL está listo"
               break
             fi
-            echo "Esperando MySQL... intento $i/15"
+            echo "Esperando MySQL... intento $i/5"
+            docker logs mysql | tail -n 10
             sleep 10
           done
-          # Esperar a que Flask responda (desde dentro del contenedor)
-          for i in {1..15}; do
+          # Verificar estado de Flask
+          docker ps | grep flask || echo "Contenedor Flask no está corriendo"
+          # Esperar a que Flask responda
+          for i in {1..5}; do
             if docker exec flask curl -s http://localhost:5000 > /dev/null 2>&1; then
               echo "Flask está listo"
               break
             fi
-            echo "Esperando Flask... intento $i/15"
+            echo "Esperando Flask... intento $i/5"
+            docker logs flask | tail -n 10
             sleep 10
           done
 
@@ -75,20 +81,24 @@ jobs:
         run: |
           docker compose up -d --build
           echo "Esperando que los servicios arranquen..."
-          for i in {1..15}; do
+          docker ps -a
+          for i in {1..5}; do
             if docker exec mysql mysqladmin ping -h localhost -uuser -puserpassword; then
               echo "MySQL está listo"
               break
             fi
-            echo "Esperando MySQL... intento $i/15"
+            echo "Esperando MySQL... intento $i/5"
+            docker logs mysql | tail -n 10
             sleep 10
           done
-          for i in {1..15}; do
+          docker ps | grep flask || echo "Contenedor Flask no está corriendo"
+          for i in {1..5}; do
             if docker exec flask curl -s http://localhost:5000 > /dev/null 2>&1; then
               echo "Flask está listo"
               break
             fi
-            echo "Esperando Flask... intento $i/15"
+            echo "Esperando Flask... intento $i/5"
+            docker logs flask | tail -n 10
             sleep 10
           done
 
