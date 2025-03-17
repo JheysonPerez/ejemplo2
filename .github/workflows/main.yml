@@ -30,7 +30,7 @@ jobs:
         run: docker logs flask > flask_logs.txt  # Guardamos los logs en un archivo
 
       - name: Subir logs como artefacto
-        uses: actions/upload-artifact@e54be7313f7c8c8fd9b4bde436d3b699b5b2b77e  # Usamos SHA explícito
+        uses: actions/upload-artifact@v3  # Usamos la versión v3
         with:
           name: logs-flask
           path: flask_logs.txt  # El archivo generado de los logs
@@ -62,7 +62,7 @@ jobs:
           pytest tests/test_app.py --html=tests/report/report.html  # Generamos un reporte HTML en tests/report
 
       - name: Subir reporte de pruebas
-        uses: actions/upload-artifact@e54be7313f7c8c8fd9b4bde436d3b699b5b2b77e  # Usamos SHA explícito
+        uses: actions/upload-artifact@v3  # Usamos la versión v3
         with:
           name: reporte-pruebas
           path: tests/report/report.html  # Subimos el reporte HTML generado
