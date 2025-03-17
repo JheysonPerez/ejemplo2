@@ -41,10 +41,14 @@ jobs:
       - name: Instalar dependencias de pruebas
         run: pip install -r requirements-test.txt
 
-      - name: Verificar respuesta simple de Flask
+      - name: Mostrar contenedores en ejecución
+        run: docker ps -a
+      
+      - name: Verificar respuesta simple de Flask desde el contenedor
         run: |
           echo "Verificando respuesta simple de Flask desde el contenedor..."
           docker exec flask curl --retry 5 --retry-delay 5 http://localhost:5000
+      
       
 
       - name: Ejecutar pruebas automáticas
