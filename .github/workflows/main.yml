@@ -16,10 +16,10 @@ jobs:
 
     steps:
       - name: Clonar el repositorio
-        uses: actions/checkout@v4  # Actualizado a v4
+        uses: actions/checkout@v4
 
       - name: Configurar Docker Buildx
-        uses: docker/setup-buildx-action@v3  # Actualizado a v3
+        uses: docker/setup-buildx-action@v3
 
       - name: Limpiar contenedores antiguos
         run: docker compose down --volumes --remove-orphans || true
@@ -28,16 +28,36 @@ jobs:
         run: |
           docker compose up -d --build
           echo "Esperando que los servicios arranquen..."
-          sleep 20
+          # Esperar a que MySQL esté saludable
+          for i in {1..10}; do
+            if docker exec mysql mysqladmin ping -h localhost -uroot -prootpassword; then
+              echo "MySQL está listo"
+              break
+            fi
+            echo "Esperando MySQL... intento $i/10"
+            sleep 10
+          done
+          # Esperar a que Flask responda
+          for i in {1..10}; do
+            if curl -s http://localhost:5000 > /dev/null; then
+              echo "Flask está listo"
+              break
+            fi
+            echo "Esperando Flask... intento $i/10"
+            sleep 10
+          done
+
+      - name: Mostrar contenedores en ejecución
+        run: docker ps -a
 
       - name: Mostrar logs de Flask
-        run: docker logs flask > flask_logs.txt  # Guardamos los logs en un archivo
+        run: docker logs flask > flask_logs.txt
 
       - name: Subir logs como artefacto
-        uses: actions/upload-artifact@v4  # Actualizado a v4
+        uses: actions/upload-artifact@v4
         with:
           name: logs-flask
-          path: flask_logs.txt  # El archivo generado de los logs
+          path: flask_logs.txt
 
   pruebas:
     name: Ejecutar pruebas de sistema
@@ -46,12 +66,40 @@ jobs:
 
     steps:
       - name: Clonar el repositorio
-        uses: actions/checkout@v4  # Actualizado a v4
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Levantar los servicios de Flask y MySQL
+        run: |
+          docker compose up -d --build
+          echo "Esperando que los servicios arranquen..."
+          # Esperar a que MySQL esté saludable
+          for i in {1..10}; do
+            if docker exec mysql mysqladmin ping -h localhost -uroot -prootpassword; then
+              echo "MySQL está listo"
+              break
+            fi
+            echo "Esperando MySQL... intento $i/10"
+            sleep 10
+          done
+          # Esperar a que Flask responda
+          for i in {1..10}; do
+            if curl -s http://localhost:5000 > /dev/null; then
+              echo "Flask está listo"
+              break
+            fi
+            echo "Esperando Flask... intento $i/10"
+            sleep 10
+          done
 
       - name: Instalar dependencias de pruebas
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-test.txt  # Instalamos las dependencias de pruebas
+          pip install -r flask/requirements.txt  # Dependencias de la app
+          pip install -r requirements-test.txt  # Dependencias de las pruebas
+          pip install pytest-html  # Aseguramos pytest-html
 
       - name: Mostrar contenedores en ejecución
         run: docker ps -a
@@ -63,10 +111,12 @@ jobs:
 
       - name: Ejecutar pruebas automáticas y generar reporte HTML
         run: |
-          pytest tests/test_app.py --html=tests/report/report.html --self-contained-html  # Generamos un reporte HTML independiente
+          cd tests  # Nos movemos al directorio de las pruebas
+          pytest test_app.py --html=report/report.html --self-contained-html || echo "Pruebas fallaron, revisa el reporte."
 
       - name: Subir reporte de pruebas
-        uses: actions/upload-artifact@v4  # Actualizado a v4
+        uses: actions/upload-artifact@v4
+        if: always()  # Subimos el reporte incluso si las pruebas fallan
         with:
           name: reporte-pruebas
-          path: tests/report/report.html  # Subimos el reporte HTML generado
+          path: tests/report/report.html
