@@ -20,14 +20,19 @@ jobs:
       - name: Limpiar contenedores antiguos
         run: docker compose down --volumes --remove-orphans || true
 
-      - name: Levantar los servicios de Flask y MySQL
+      - name: Construir la imagen de Flask
         run: |
-          docker compose up -d --build
-          echo "Esperando que los servicios arranquen..."
-          sleep 20
+          docker compose build flask
 
-      - name: Mostrar logs de Flask
-        run: docker logs flask
+      - name: Guardar imagen de Flask como tar
+        run: |
+          docker save flask:latest -o flask.tar
+
+      - name: Subir imagen como artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flask-image
+          path: flask.tar
 
   pruebas:
     name: Ejecutar pruebas de sistema
@@ -38,17 +43,39 @@ jobs:
       - name: Clonar el repositorio
         uses: actions/checkout@v2
 
-      - name: Instalar dependencias de pruebas
-        run: pip install -r requirements-test.txt
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Descargar la imagen de Flask desde artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: flask-image
+
+      - name: Cargar imagen de Flask
+        run: docker load -i flask.tar
+
+      - name: Levantar los servicios usando docker-compose
+        run: |
+          docker compose up -d
+          echo "Esperando que los servicios arranquen..."
+          sleep 20
 
       - name: Mostrar contenedores en ejecución
         run: docker ps -a
-      
+
+      - name: Mostrar logs de Flask
+        run: docker logs flask
+
       - name: Verificar respuesta simple de Flask desde el contenedor
         run: |
           echo "Verificando respuesta simple de Flask desde el contenedor..."
           docker exec flask curl --retry 5 --retry-delay 5 http://localhost:5000
-      
+
+      - name: Instalar dependencias de pruebas
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+
       - name: Ejecutar pruebas automáticas
         run: pytest tests/
 
