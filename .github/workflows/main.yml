@@ -75,20 +75,20 @@ jobs:
         run: |
           docker compose up -d --build
           echo "Esperando que los servicios arranquen..."
-          for i in {1..10}; do
-            if docker exec mysql mysqladmin ping -h localhost -uroot -prootpassword; then
+          for i in {1..15}; do
+            if docker exec mysql mysqladmin ping -h localhost -uuser -puserpassword; then
               echo "MySQL está listo"
               break
             fi
-            echo "Esperando MySQL... intento $i/10"
+            echo "Esperando MySQL... intento $i/15"
             sleep 10
           done
-          for i in {1..10}; do
-            if curl -s http://localhost:5000 > /dev/null; then
+          for i in {1..15}; do
+            if docker exec flask curl -s http://localhost:5000 > /dev/null 2>&1; then
               echo "Flask está listo"
               break
             fi
-            echo "Esperando Flask... intento $i/10"
+            echo "Esperando Flask... intento $i/15"
             sleep 10
           done
 
@@ -96,12 +96,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r flask/requirements.txt
-          pip install mysql-connector-python  # Aseguramos que esté instalado
+          pip install mysql-connector-python
 
       - name: Instalar dependencias de pruebas
         run: |
           pip install -r requirements-test.txt
-          pip install pytest requests pytest-html  # Aseguramos todas las dependencias de pruebas
+          pip install pytest requests pytest-html
 
       - name: Mostrar contenedores en ejecución
         run: docker ps -a
