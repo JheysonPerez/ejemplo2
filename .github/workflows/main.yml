@@ -110,26 +110,15 @@ jobs:
       - name: Levantar los servicios
         run: docker compose up -d
 
-      - name: Esperar y descargar respuesta de Job 1
+      - name: Instalar GitHub CLI
         run: |
-          echo "Esperando el artifact de Job 1..."
-          for i in {1..5}; do
-            if [ -f "flask_response.txt" ]; then
-              echo "Artifact ya descargado, saliendo del bucle"
-              break
-            fi
-            echo "Intentando descargar artifact... intento $i/5"
-            if actions_download_artifact --name flask-response-job-1 --path .; then
-              echo "Artifact descargado exitosamente"
-              break
-            fi
-            echo "Artifact no disponible aún, esperando..."
-            sleep 10
-          done
-          if [ ! -f "flask_response.txt" ]; then
-            echo "No se pudo descargar el artifact después de 5 intentos"
-            exit 1
-          fi
+          sudo apt-get update
+          sudo apt-get install -y gh
+
+      - name: Esperar y descargar respuesta de Job 1
+        run: ./wait_for_artifact.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verificar conexión a MySQL
         run: |
