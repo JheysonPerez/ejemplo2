@@ -89,7 +89,6 @@ jobs:
             sleep 10
           done
 
- arama
       - name: Subir respuesta de Flask como artefacto
         uses: actions/upload-artifact@v4
         with:
@@ -115,14 +114,19 @@ jobs:
         run: |
           echo "Esperando el artifact de Job 1..."
           for i in {1..5}; do
-            if actions/download-artifact@v4 --name flask-response-job-1 --path . 2>/dev/null; then
+            if [ -f "flask_response.txt" ]; then
+              echo "Artifact ya descargado, saliendo del bucle"
+              break
+            fi
+            echo "Intentando descargar artifact... intento $i/5"
+            if actions_download_artifact --name flask-response-job-1 --path .; then
               echo "Artifact descargado exitosamente"
               break
             fi
-            echo "Esperando artifact... intento $i/5"
+            echo "Artifact no disponible aún, esperando..."
             sleep 10
           done
-          if [ ! -f flask_response.txt ]; then
+          if [ ! -f "flask_response.txt" ]; then
             echo "No se pudo descargar el artifact después de 5 intentos"
             exit 1
           fi
