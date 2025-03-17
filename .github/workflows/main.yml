@@ -95,11 +95,11 @@ jobs:
           name: flask-response-job-1
           path: flask_response.txt
 
-  # Job 2 post-despliegue, corre en paralelo pero espera dinámicamente el artifact
+  # Job 2 post-despliegue, depende de Job 1 para garantizar el artifact
   post_despliegue_job_2:
     name: Post-Despliegue Job 2 - Verificar MySQL
     runs-on: ubuntu-latest
-    needs: despliegue
+    needs: [despliegue, post_despliegue_job_1]
     steps:
       - name: Clonar el repositorio
         uses: actions/checkout@v4
@@ -110,18 +110,11 @@ jobs:
       - name: Levantar los servicios
         run: docker compose up -d
 
-      - name: Instalar GitHub CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gh
-
-      - name: Hacer el script ejecutable
-        run: chmod +x wait_for_artifact.sh
-
-      - name: Esperar y descargar respuesta de Job 1
-        run: ./wait_for_artifact.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Descargar respuesta de Job 1
+        uses: actions/download-artifact@v4
+        with:
+          name: flask-response-job-1
+          path: .
 
       - name: Verificar conexión a MySQL
         run: |
