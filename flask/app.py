@@ -15,9 +15,9 @@ try:
     cursor = conn.cursor()
     cursor.execute("SELECT 1")  # Consulta simple para verificar conexión
     conn.close()
-    message = "Estoy agarrando señal desde MySQL :!"
+    message = "Estoy agarrando señal desde MySQL :)"
 except mysql.connector.Error as e:
-    message = "Error al conectar a MySQL"
+    message = f"Error al conectar a MySQL: {str(e)}"
 
 @app.route('/')
 def home():
