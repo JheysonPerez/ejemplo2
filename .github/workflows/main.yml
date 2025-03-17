@@ -27,13 +27,13 @@ jobs:
           sleep 20
 
       - name: Mostrar logs de Flask
-        run: docker logs flask
+        run: docker logs flask > flask_logs.txt  # Guardamos los logs en un archivo
 
-      - name: Guardar logs como artefacto
+      - name: Subir logs como artefacto
         uses: actions/upload-artifact@v3
         with:
           name: logs-flask
-          path: ./ruta/al/log/flask.log
+          path: flask_logs.txt  # El archivo generado de los logs
 
   pruebas:
     name: Ejecutar pruebas de sistema
@@ -45,21 +45,24 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Instalar dependencias de pruebas
-        run: pip install -r requirements-test.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt  # Instalamos las dependencias de pruebas
 
       - name: Mostrar contenedores en ejecución
         run: docker ps -a
-      
+
       - name: Verificar respuesta simple de Flask desde el contenedor
         run: |
           echo "Verificando respuesta simple de Flask desde el contenedor..."
           docker exec flask curl --retry 5 --retry-delay 5 http://localhost:5000
-      
-      - name: Ejecutar pruebas automáticas
-        run: pytest tests/
+
+      - name: Ejecutar pruebas automáticas y generar reporte HTML
+        run: |
+          pytest tests/test_app.py --html=tests/report/report.html  # Generamos un reporte HTML en tests/report
 
       - name: Subir reporte de pruebas
         uses: actions/upload-artifact@v3
         with:
           name: reporte-pruebas
-          path: ./tests/report/
+          path: tests/report/report.html  # Subimos el reporte HTML generado
