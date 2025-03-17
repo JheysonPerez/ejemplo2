@@ -3,37 +3,42 @@ name: Proyecto
 on:
   push:
     branches:
-      - main
+      - main  # Se ejecuta cuando haces push a la rama "main"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  construir:
+    runs-on: ubuntu-latest  # Utiliza un runner de Ubuntu
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Clonar el repositorio
+        uses: actions/checkout@v2  # Clona el código del repositorio en el runner
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v2  # Configura Buildx para construir imágenes Docker
 
-      - name: Clean up previous containers (if any)
+      - name: Limpiar contenedores anteriores 
         run: |
           docker compose down --volumes --remove-orphans || true
+        # Detiene y elimina contenedores, volúmenes y redes antiguas
 
-      - name: Build and run containers
+      - name: Construir y levantar los contenedores
         run: |
           docker compose up -d --build
           echo "Esperando 15 segundos para que los servicios se inicialicen..."
           sleep 15
+        # Levanta los servicios en segundo plano y espera para asegurar que estén listos
 
-      - name: Mostrar logs de Flask
+      - name: Mostrar los logs del servicio Flask
         run: docker logs flask
+        # Muestra los logs del contenedor de Flask para revisar su estado
 
-      - name: Verificar respuesta del servicio Flask
+      - name: Verificar la respuesta del servicio Flask
         run: |
-          echo "Verificando respuesta del servicio Flask..."
+          echo "Verificando la respuesta del servicio Flask..."
           curl --retry 5 --retry-delay 5 http://localhost:5000
+        # Realiza una solicitud HTTP al endpoint de Flask y reintenta en caso de fallo
 
-      - name: Tear down containers
-        if: always()  # Esto asegura que se ejecute aunque falle un paso anterior
+      - name: Apagar y limpiar los contenedores
+        if: always()  # Se ejecuta siempre, aunque haya fallado algún paso anterior
         run: docker compose down --volumes --remove-orphans
+        # Detiene y elimina contenedores, volúmenes y redes después de las pruebas
