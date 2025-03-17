@@ -1,2 +1,2 @@
-Flask
-pyodbc
+Flask==2.2.3
+PyMySQL==1.1.0
