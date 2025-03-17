@@ -115,6 +115,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gh
 
+      - name: Hacer el script ejecutable
+        run: chmod +x wait_for_artifact.sh
+
       - name: Esperar y descargar respuesta de Job 1
         run: ./wait_for_artifact.sh
         env:
