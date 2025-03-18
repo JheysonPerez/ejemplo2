@@ -27,27 +27,7 @@ jobs:
       - name: Levantar los servicios de Flask y MySQL
         run: |
           docker compose up -d --build
-          echo "Esperando que los servicios arranquen..."
-          docker ps -a
-          for i in {1..5}; do
-            if docker exec mysql mysqladmin ping -h localhost -uuser -puserpassword; then
-              echo "MySQL está listo"
-              break
-            fi
-            echo "Esperando MySQL... intento $i/5"
-            docker logs mysql | tail -n 10
-            sleep 10
-          done
-          docker ps | grep flask || echo "Contenedor Flask no está corriendo"
-          for i in {1..5}; do
-            if docker exec flask curl -s http://localhost:5000 > /dev/null 2>&1; then
-              echo "Flask está listo"
-              break
-            fi
-            echo "Esperando Flask... intento $i/5"
-            docker logs flask | tail -n 10
-            sleep 10
-          done
+          echo "Servicios levantados..."
 
       - name: Mostrar contenedores en ejecución
         run: docker ps -a
@@ -81,7 +61,9 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Levantar los servicios
-        run: docker compose up -d
+        run: |
+          docker compose up -d
+          echo "Servicios levantados..."
 
       - name: Verificar respuesta de Flask
         run: |
@@ -117,7 +99,9 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Levantar los servicios
-        run: docker compose up -d
+        run: |
+          docker compose up -d
+          echo "Servicios levantados..."
 
       - name: Esperar y leer respuesta de Job 1 desde el repositorio
         run: |
@@ -168,27 +152,7 @@ jobs:
       - name: Levantar los servicios
         run: |
           docker compose up -d --build
-          echo "Esperando que los servicios arranquen..."
-          docker ps -a
-          for i in {1..5}; do
-            if docker exec mysql mysqladmin ping -h localhost -uuser -puserpassword; then
-              echo "MySQL está listo"
-              break
-            fi
-            echo "Esperando MySQL... intento $i/5"
-            docker logs mysql | tail -n 10
-            sleep 10
-          done
-          docker ps | grep flask || echo "Contenedor Flask no está corriendo"
-          for i in {1..5}; do
-            if docker exec flask curl -s http://localhost:5000 > /dev/null 2>&1; then
-              echo "Flask está listo"
-              break
-            fi
-            echo "Esperando Flask... intento $i/5"
-            docker logs flask | tail -n 10
-            sleep 10
-          done
+          echo "Servicios levantados..."
 
       - name: Instalar dependencias de la aplicación
         run: |
