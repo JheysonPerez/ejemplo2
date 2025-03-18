@@ -65,7 +65,7 @@ jobs:
           docker compose up -d
           echo "Servicios levantados..."
 
-      - name: Verificar respuesta de Flask
+      - name: Verificar respuesta de Flask y guardar en flask_response.txt
         run: |
           echo "Verificando Flask desde Job 1..."
           for i in {1..5}; do
@@ -74,21 +74,24 @@ jobs:
               cat flask_response.txt
               break
             else
-              echo "Intento $i/5 falló, generando archivo de error..."
-              echo "Error: No se pudo conectar a Flask en el intento $i" > flask_response.txt
+              echo "Intento $i/5 falló, esperando..."
             fi
-            echo "Esperando respuesta de Flask... intento $i/5"
+            if [ $i -eq 5 ]; then
+              echo "Error: No se pudo conectar a Flask después de 5 intentos" > flask_response.txt
+              echo "Guardando mensaje de error en flask_response.txt"
+            fi
             sleep 10
           done
           if [ ! -f "flask_response.txt" ]; then
             echo "Error: No se pudo crear flask_response.txt" > flask_response.txt
+            echo "Forzando creación de archivo con error"
           fi
 
       - name: Guardar respuesta en el repositorio
         run: |
           git add flask_response.txt
-          git commit -m "Add Flask response from post_despliegue_job_1" || echo "No changes to commit"
-          git push || echo "Push failed, but continuing"
+          git commit -m "Add Flask response from post_despliegue_job_1"
+          git push
 
   # Job 2 post-despliegue, corre en paralelo y lee del repositorio
   post_despliegue_job_2:
