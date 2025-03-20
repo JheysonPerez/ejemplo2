@@ -18,7 +18,7 @@ def test_home_endpoint_success():
                 pytest.fail(f"Failed to connect after {max_attempts} attempts: {e}")
             time.sleep(5)
 
-# Pruebas CRUD
+# Pruebas crud
 def test_create_user():
     """Prueba la creación de un nuevo usuario."""
     payload = {"name": "Test User", "value": "123"}
