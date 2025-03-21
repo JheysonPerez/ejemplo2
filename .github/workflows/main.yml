@@ -7,7 +7,7 @@ on:
 
 permissions:
   actions: write
-  contents: write  # Necesario para hacer push al repositorio
+  contents: write  
 
 jobs:
   despliegue:
